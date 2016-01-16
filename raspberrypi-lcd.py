@@ -52,7 +52,21 @@
 
 #import
 import RPi.GPIO as GPIO
+import os
 import time
+from time import gmtime, strftime
+
+def getCPUtemperature():
+  res = os.popen("vcgencmd measure_temp").readline()
+  return(res.replace("temp=","").replace("'C\n",""))
+
+def printDateTime():
+  textDate = strftime("%d %A %Y", gmtime())
+  lcd_string(textDate,LCD_LINE_1)
+  textTime = strftime("%H:%M:%S", gmtime())
+  lcd_string(textTime,LCD_LINE_2)
+  return
+
 
 # Define GPIO to LCD mapping
 LCD_RS = 7
@@ -76,7 +90,6 @@ E_PULSE = 0.0005
 E_DELAY = 0.0005
 
 def main():
-  print "main..."
   # Main program block
   
   GPIO.setwarnings(False)
@@ -94,16 +107,24 @@ def main():
 
   while True:
 
+    index=0
+    while index < 5:
+      printDateTime()
+      time.sleep(1)
+      index += 1
+
     # Send some test
-    print "printing..."
-    lcd_string("Rasbperry Pi",LCD_LINE_1)
-    lcd_string("16x2 LCD Test",LCD_LINE_2)
+    textDate = strftime("%d %A %Y", gmtime())
+    lcd_string(textDate,LCD_LINE_1)
+    textTime = strftime("%H:%M:%S", gmtime())
+    lcd_string(textTime,LCD_LINE_2)
 
     time.sleep(3) # 3 second delay
 
     # Send some text
-    lcd_string("1234567890123456",LCD_LINE_1)
-    lcd_string("abcdefghijklmnop",LCD_LINE_2)
+    lcd_string("CPU temperature:",LCD_LINE_1)
+    textCPU = getCPUtemperature()+"C"
+    lcd_string(textCPU,LCD_LINE_2)
 
     time.sleep(3) # 3 second delay
 
