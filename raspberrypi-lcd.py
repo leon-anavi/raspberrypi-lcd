@@ -53,6 +53,9 @@
 #import
 import RPi.GPIO as GPIO
 import os
+import socket
+import fcntl
+import struct
 import time
 from time import gmtime, strftime
 
@@ -62,11 +65,29 @@ def getCPUtemperature():
 
 def printDateTime():
   textDate = strftime("%d %A %Y", gmtime())
-  lcd_string(textDate,LCD_LINE_1)
   textTime = strftime("%H:%M:%S", gmtime())
+  lcd_string(textDate,LCD_LINE_1)
   lcd_string(textTime,LCD_LINE_2)
   return
 
+def getInterfaceAddress(ifname):
+  try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+      s.fileno(),
+      0x8915,  # SIOCGIFADDR
+      struct.pack('256s', ifname[:15])
+    )[20:24])
+  except:
+    return ''
+
+def getIP():
+  ipWlan = getInterfaceAddress('wlan0')
+  if ipWlan:
+    return ipWlan
+  ipEth = getInterfaceAddress('eth0')
+  if ipEth:
+    return ipEth
 
 # Define GPIO to LCD mapping
 LCD_RS = 7
@@ -107,30 +128,24 @@ def main():
 
   while True:
 
-    index=0
+    # Display date and time
+    index = 0
     while index < 5:
       printDateTime()
       time.sleep(1)
       index += 1
 
-    # Send some test
-    textDate = strftime("%d %A %Y", gmtime())
-    lcd_string(textDate,LCD_LINE_1)
-    textTime = strftime("%H:%M:%S", gmtime())
-    lcd_string(textTime,LCD_LINE_2)
-
-    time.sleep(3) # 3 second delay
-
-    # Send some text
+    # Display CPU temperature
     lcd_string("CPU temperature:",LCD_LINE_1)
     textCPU = getCPUtemperature()+"C"
     lcd_string(textCPU,LCD_LINE_2)
 
-    time.sleep(3) # 3 second delay
+    time.sleep(3)
 
-    # Send some text
-    lcd_string("Hello",LCD_LINE_1)
-    lcd_string("World!",LCD_LINE_2)
+    # Display local IP
+    lcd_string("IP:",LCD_LINE_1)
+    textIP = getIP()
+    lcd_string(textIP,LCD_LINE_2)
 
     time.sleep(3)
 
