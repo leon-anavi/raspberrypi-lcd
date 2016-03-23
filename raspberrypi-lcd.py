@@ -210,11 +210,9 @@ def lcd_toggle_enable():
   time.sleep(E_DELAY)
 
 def lcd_string(message,line):
+  # Cast to string
+  message = str(message)
   # Send string to display
-
-
-
-
   message = message.ljust(LCD_WIDTH," ")
 
   lcd_byte(line, LCD_CMD)
