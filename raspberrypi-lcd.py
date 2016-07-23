@@ -90,12 +90,20 @@ def getIP():
     return ipEth
 
 # Define GPIO to LCD mapping
+# RESET - pin 7 GPIO4
+# Enable - pin 40 GPIO21
+# D4 - pin 13 GPIO27
+# D5 - pin 15 GPIO22
+# D6 - pin 19 GPIO10
+# D7 - pin 21 GPIO9
 LCD_RS = 4
-LCD_E  = 17
+LCD_E  = 21
 LCD_D4 = 27
 LCD_D5 = 22
 LCD_D6 = 10
 LCD_D7 = 9
+
+
 
 # Define some device constants
 LCD_WIDTH = 16    # Maximum characters per line
